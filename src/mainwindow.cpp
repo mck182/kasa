@@ -20,6 +20,10 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QFileDialog>
+#include <QDir>
+#include <QMessageBox>
+
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
 #include <QtCharts/QChartView>
@@ -30,6 +34,7 @@ QT_CHARTS_USE_NAMESPACE
 
 #include <algorithm>
 
+#include "ofx/import/ofximporter.h"
 
 #include "itemmodels/tagsitemmodel.h"
 #include "datamodels/qaccount.h"
@@ -46,12 +51,29 @@ MainWindow::MainWindow(QWidget *parent)
     m_ui->setupUi(this);
     m_ui->pieChart->setRenderHint(QPainter::Antialiasing);
 
-
     connect(m_ui->actionEditTransactions, &QAction::triggered, [=] {
         TransactionsWindow *transactionsWindow = new TransactionsWindow(this);
         transactionsWindow->exec();
 
         m_tagsModel->reloadData();
+        AccountManager::sharedInstance()->reloadTransactions();
+    });
+
+    connect(m_ui->actionImportOfxFile, &QAction::triggered, [=] {
+        QString filename = QFileDialog::getOpenFileName(this, "Open OFX file", QDir::homePath(), "OFX Files (*.ofx)");
+
+        OFXImporter *importer = new OFXImporter(this, QVariantList());
+        bool import = importer->import(filename);
+
+        if (!import) {
+            QMessageBox::critical(this, "Couldn't load this file", "The file you have selected could not be loaded");
+        } else {
+            DbDao::sharedInstance()->storeAccount(importer->account());
+            DbDao::sharedInstance()->storeTransactions(importer->account()->transactions());
+
+            AccountManager::sharedInstance()->setAccount(importer->account());
+            m_ui->listView->setCurrentIndex(m_tagsModel->index(0, 0));
+        }
     });
 
     connect(AccountManager::sharedInstance(), &AccountManager::amountsChanged, [=](const QHash<QAccount::AmountType, double> &amounts) {
@@ -210,4 +232,13 @@ void MainWindow::setAccount(QAccount *account)
     AccountManager::sharedInstance()->setDates(QDate(2018, 8, 1), QDate(2018, 12, 1));
 
     m_ui->listView->setCurrentIndex(m_tagsModel->index(0, 0));
+}
+
+void MainWindow::askForImport()
+{
+    auto answer = QMessageBox::question(this, "No accounts yet", "There are no transactions yet. Would you like to import a file now?");
+
+    if (answer == QMessageBox::Yes) {
+        m_ui->actionImportOfxFile->trigger();
+    }
 }

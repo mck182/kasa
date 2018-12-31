@@ -38,7 +38,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     
     void setAccount(QAccount *account);
-    void calculateAmounts(const QStringList &tags);
+    void askForImport();
 
 private:
     Ui::MainWindow *m_ui;

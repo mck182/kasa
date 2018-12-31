@@ -208,6 +208,9 @@
    </property>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextOnly</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -215,11 +218,20 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionEditTransactions"/>
+   <addaction name="actionImportOfxFile"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionEditTransactions">
    <property name="text">
-    <string>Edit transactions</string>
+    <string>Edit transactions...</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit transactions...</string>
+   </property>
+  </action>
+  <action name="actionImportOfxFile">
+   <property name="text">
+    <string>Import OFX file...</string>
    </property>
   </action>
  </widget>
