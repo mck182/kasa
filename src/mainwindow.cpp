@@ -19,6 +19,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <algorithm>
+
 #include <QDebug>
 #include <QFileDialog>
 #include <QDir>
@@ -30,9 +32,6 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QDateTimeAxis>
 #include <QtCharts/QValueAxis>
-QT_CHARTS_USE_NAMESPACE
-
-#include <algorithm>
 
 #include "ofx/import/ofximporter.h"
 
@@ -42,6 +41,8 @@ QT_CHARTS_USE_NAMESPACE
 #include "transactionswindow.h"
 #include "accountmanager.h"
 #include "database/dbdao.h"
+
+QT_CHARTS_USE_NAMESPACE
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),

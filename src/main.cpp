@@ -35,16 +35,6 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QStatement*>();
     qRegisterMetaType<QTransaction*>();
 
-    OFXImporter *importer = new OFXImporter(&app, QVariantList());
-    bool import = importer->import("test.ofx");
-
-    if (import) {
-        qDebug() << *(importer->account());
-    }
-
-//    DbDao::sharedInstance()->storeAccount(importer->account());
-//    DbDao::sharedInstance()->storeTransactions(importer->account()->transactions());
-
     MainWindow w;
     w.show();
 
@@ -54,7 +44,9 @@ int main(int argc, char *argv[])
         account->setTransactions(transactions);
     }
 
-    if (!accounts.isEmpty()) {
+    if (accounts.isEmpty()) {
+        w.askForImport();
+    } else {
         w.setAccount(accounts.at(0));
     }
 
