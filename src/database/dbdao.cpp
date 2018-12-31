@@ -205,8 +205,6 @@ bool DbDao::storeTransaction(QTransaction *transaction)
 
 bool DbDao::updateTransaction(QTransaction *transaction)
 {
-    QSqlQuery q;
-
     if (!transaction->tags().isEmpty()) {
         Db::sharedInstance()->startTransaction();
 
@@ -216,38 +214,41 @@ bool DbDao::updateTransaction(QTransaction *transaction)
             }
 
             //TODO: explore single-query multi-insert
+            QSqlQuery q;
             q.prepare("INSERT OR IGNORE INTO Tags VALUES (NULL, :name)");
             q.bindValue(":name", tag);
             q.exec();
 
             int tagId;
 
-            qDebug() << "---> Last insert is valid:" << q.lastInsertId().isValid() << "is null:" << q.lastInsertId().isNull();
-            if (!q.lastInsertId().isValid()) {
-                QSqlQuery q;
-                q.prepare("SELECT id FROM Tags WHERE name = :name");
-                q.bindValue(":name", tag);
-                q.exec();
-                qDebug() << "---> Select tags query active:" << q.isActive();
-                if (q.isActive()) {
-                    q.next();
-                    tagId = q.value(0).toInt();
+            //FIXME: This should work but it doesn't
+//            qDebug() << "---> Last insert is valid:" << q.lastInsertId().isValid() << "is null:" << q.lastInsertId().isNull();
+//            if (!q.lastInsertId().isValid()) {
+                QSqlQuery tagQuery;
+                tagQuery.prepare("SELECT id FROM Tags WHERE name = :name");
+                tagQuery.bindValue(":name", tag);
+                tagQuery.exec();
+                qDebug() << "---> Select tags query active:" << tagQuery.isActive();
+                if (tagQuery.isActive()) {
+                    tagQuery.next();
+                    tagId = tagQuery.value(0).toInt();
                 }
-            } else {
-                qDebug() << "---> Got valid last insert id:" << q.lastInsertId().toInt();
-                tagId = q.lastInsertId().toInt();
-            }
+//            } else {
+//                qDebug() << "---> Got valid last insert id:" << q.lastInsertId().toInt();
+//                tagId = q.lastInsertId().toInt();
+//            }
 
-            QSqlQuery q;
-            q.prepare("INSERT INTO TransactionTags VALUES (:transactionId, :tagId)");
-            q.bindValue(":transactionId", transaction->id());
-            q.bindValue(":tagId", tagId);
-            q.exec();
+            QSqlQuery q2;
+            q2.prepare("INSERT INTO TransactionTags VALUES (:transactionId, :tagId)");
+            q2.bindValue(":transactionId", transaction->id());
+            q2.bindValue(":tagId", tagId);
+            q2.exec();
         }
 
         Db::sharedInstance()->commit();
     }
 
+    QSqlQuery q;
     q.prepare("UPDATE Transactions SET memo = :memo,"
               "payeeId = :payeeId,"
               "name = :name,"
