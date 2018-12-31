@@ -147,7 +147,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_ui->pieChart->chart()->addSeries(series);
         m_ui->pieChart->chart()->setAnimationOptions(QChart::AllAnimations);
         m_ui->pieChart->chart()->setBackgroundVisible(false);
-        m_ui->pieChart->chart()->setTheme(QChart::ChartThemeDark);
+        m_ui->pieChart->chart()->setTheme(QChart::ChartThemeLight);
         m_ui->pieChart->chart()->legend()->setAlignment(Qt::AlignLeft);
 
 //        QLineSeries *lineSeries = new QLineSeries();
