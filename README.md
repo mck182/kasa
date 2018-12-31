@@ -13,7 +13,7 @@ You need Qt5, including QtCharts, CMake 3 or higher and libOfx
 
 #### Build instructions
 
-Clone the project first, then prepare the build:
+Standard CMake stuff; clone the project first, then prepare the build:
 ```
 cd kasa
 mkdir build
