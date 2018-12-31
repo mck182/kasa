@@ -41,13 +41,15 @@ public:
 
     static AccountManager* sharedInstance();
 
+public Q_SLOTS:
+    void reloadTransactions();
+
 Q_SIGNALS:
     void accountChanged(QAccount *account);
     void transactionsChanged();
     void amountsChanged(const QHash<QAccount::AmountType, double> &amounts);
 
 private:
-    void reloadTransactions();
     void filterTransactions();
     void recalculateAmounts();
 
