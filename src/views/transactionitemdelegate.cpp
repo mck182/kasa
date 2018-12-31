@@ -53,7 +53,7 @@ void TransactionItemDelegate::paint(QPainter *painter, const QStyleOptionViewIte
     amountRect.setLeft(amountRect.right() - 72);
 
     QRect tagsRect = baseRect;
-    tagsRect.setTop(baseRect.height() / 2 + 4);
+    tagsRect.setTop(baseRect.top() + baseRect.height() / 2);
     tagsRect.setLeft(nameRect.left());
 
     painter->save();
