@@ -37,7 +37,9 @@ set(kasa_SRC
     src/itemmodels/tagsitemmodel.cpp
     src/itemmodels/transactionsitemmodel.cpp
     src/views/transactionitemdelegate.cpp
-    src/views/transactioneditor.cpp src/accountmanager.cpp src/accountmanager.h src/itemmodels/transactionsfilterproxymodel.cpp src/itemmodels/transactionsfilterproxymodel.h)
+    src/views/transactioneditor.cpp
+    src/accountmanager.cpp
+    src/itemmodels/transactionsfilterproxymodel.cpp)
 
 # Tell CMake to create the helloworld executable
 add_executable(kasa ${kasa_SRC})
