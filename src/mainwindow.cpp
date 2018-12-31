@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
       m_tagsModel(new TagsItemModel(this))
 {
     m_ui->setupUi(this);
+    m_ui->pieChart->setVisible(false);
+    m_ui->transactionsView->setVisible(false);
     m_ui->pieChart->setRenderHint(QPainter::Antialiasing);
 
     connect(m_ui->actionEditTransactions, &QAction::triggered, [=] {
