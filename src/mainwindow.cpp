@@ -25,6 +25,8 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QMessageBox>
+#include <QQuickView>
+#include <QQmlContext>
 
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
@@ -36,6 +38,8 @@
 #include "ofx/import/ofximporter.h"
 
 #include "itemmodels/tagsitemmodel.h"
+#include "itemmodels/transactionsfilterproxymodel.h"
+#include "itemmodels/transactionsitemmodel.h"
 #include "datamodels/qaccount.h"
 #include "datamodels/qtransaction.h"
 #include "transactionswindow.h"
@@ -55,11 +59,23 @@ MainWindow::MainWindow(QWidget *parent)
     m_ui->pieChart->setRenderHint(QPainter::Antialiasing);
 
     connect(m_ui->actionEditTransactions, &QAction::triggered, [=] {
-        TransactionsWindow *transactionsWindow = new TransactionsWindow(this);
-        transactionsWindow->exec();
+        TransactionsFilterProxyModel *filterProxyModel = new TransactionsFilterProxyModel(this);
+        filterProxyModel->setSourceModel(new TransactionsItemModel(this, nullptr));
+        filterProxyModel->setDynamicSortFilter(true);
 
-        m_tagsModel->reloadData();
-        AccountManager::sharedInstance()->reloadTransactions();
+        QQuickView *quickView = new QQuickView();
+        quickView->setSource(QUrl::fromLocalFile("../kasa/src/qml/Transactions.qml"));
+        quickView->setResizeMode(QQuickView::SizeRootObjectToView);
+        quickView->rootContext()->setContextProperty(QStringLiteral("transactionsModel"), filterProxyModel);
+        quickView->setModality(Qt::ApplicationModal);
+        quickView->show();
+
+
+//        TransactionsWindow *transactionsWindow = new TransactionsWindow(this);
+//        transactionsWindow->exec();
+
+//        m_tagsModel->reloadData();
+//        AccountManager::sharedInstance()->reloadTransactions();
     });
 
     connect(m_ui->actionImportOfxFile, &QAction::triggered, [=] {

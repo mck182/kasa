@@ -66,6 +66,19 @@ QVariant TransactionsItemModel::data(const QModelIndex &index, int role) const
         }
     } else if (role == Qt::UserRole) {
         return QVariant::fromValue(transaction);
+    } else {
+        switch (role) {
+            case DatePostedRole:
+                return transaction->datePosted().toString(Qt::ISODate);
+            case NameRole:
+                return transaction->name();
+            case MemoRole:
+                return transaction->memo();
+            case TagsRole:
+                return transaction->tags().join(", ");
+            case AmountRole:
+                return transaction->amount();
+        }
     }
 
     return QVariant();
@@ -120,6 +133,18 @@ QVariant TransactionsItemModel::headerData(int section, Qt::Orientation orientat
     }
 
     return QVariant();
+}
+
+QHash<int, QByteArray> TransactionsItemModel::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+    roles[TransactionRole] = "transaction";
+    roles[DatePostedRole] = "datePosted";
+    roles[NameRole] = "name";
+    roles[MemoRole] = "memo";
+    roles[TagsRole] = "tags";
+    roles[AmountRole] = "amount";
+    return roles;
 }
 
 Qt::ItemFlags TransactionsItemModel::flags(const QModelIndex &index) const

@@ -23,6 +23,10 @@ find_package(LibOfx)
 find_package(Qt5Widgets CONFIG REQUIRED)
 find_package(Qt5Sql CONFIG REQUIRED)
 find_package(Qt5Charts CONFIG REQUIRED)
+find_package(Qt5Quick CONFIG REQUIRED)
+find_package(Qt5QuickControls2 CONFIG REQUIRED)
+
+qt5_add_resources(RCC_SOURCES src/resources.qrc)
 
 set(kasa_SRC
     src/main.cpp
@@ -39,7 +43,8 @@ set(kasa_SRC
     src/views/transactionitemdelegate.cpp
     src/views/transactioneditor.cpp
     src/accountmanager.cpp
-    src/itemmodels/transactionsfilterproxymodel.cpp)
+    src/itemmodels/transactionsfilterproxymodel.cpp
+    ${RCC_SOURCES})
 
 # Tell CMake to create the helloworld executable
 add_executable(kasa ${kasa_SRC})
@@ -49,6 +54,8 @@ target_include_directories(kasa PRIVATE ${CMAKE_SOURCE_DIR}/src/)
 target_link_libraries(kasa Qt5::Widgets
                            Qt5::Sql
                            Qt5::Charts
+                           Qt5::Quick
+                           Qt5::QuickControls2
                            ${LIBOFX_LIBRARIES})
 
 # Install the executable
