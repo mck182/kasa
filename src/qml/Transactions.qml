@@ -8,7 +8,7 @@ Item {
     width: 600
     height: 400
 
-    Material.theme: Material.Light
+    property var selectedTransactions: []
 
     ColumnLayout {
         id: columnLayout
@@ -76,9 +76,19 @@ Item {
                 Material.elevation: 1
 
                 onTransactionSelected: {
-                    console.log(selectedIndex)
+                    selectedTransactions.push(selectedTransaction)
+                    selectedTransactionsChanged()
                 }
 
+                onTransactionUnselected: {
+                    var index = selectedTransactions.indexOf(unselectedTransaction)
+                    if (index > -1) {
+                        selectedTransactions.splice(index, 1)
+                        selectedTransactionsChanged()
+                    }
+                }
+            }
+        }
 
         Pane {
             id: batchTagsPane
