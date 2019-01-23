@@ -79,9 +79,47 @@ Item {
                     console.log(selectedIndex)
                 }
 
+
+        Pane {
+            id: batchTagsPane
+            Layout.fillWidth: true
+            height: 56
+
+            Material.elevation: 1
+
+            visible: selectedTransactions.length > 0
+            transform: yTranslation
+
+            Translate {
+                id: yTranslation
+                y: batchTagsPane.visible ? 0 : 56
+
+                Behavior on y {
+                    NumberAnimation {
+                        duration: 100
+                    }
+                }
             }
 
+            RowLayout {
+                anchors.fill: parent
+                spacing: batchTagsPane.leftPadding
+
+                TextField {
+                    id: batchTagsTextField
+                    Layout.fillWidth: true
+                    placeholderText: "Add your tags here..."
+                }
+
+                Button {
+                    id: applyBatchTagsButton
+                    text: qsTr("Apply to %L1 transactions").arg(selectedTransactions.length)
+
+                    onClicked: {
+                        dbDao.applyTags(selectedTransactions, batchTagsTextField.text)
+                    }
+                }
+            }
         }
     }
-
 }
