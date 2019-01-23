@@ -5,8 +5,8 @@ import QtQuick.Layouts 1.3
 Pane {
     width: 400
 
-    signal transactionSelected(int selectedIndex)
-    signal transactionUnselected(int unselectedIndex)
+    signal transactionSelected(var selectedTransaction)
+    signal transactionUnselected(var unselectedTransaction)
 
     GridLayout {
         id: gridLayout
@@ -21,9 +21,9 @@ Pane {
 
             onCheckedChanged: {
                 if (checked) {
-                    transactionSelected(index)
+                    transactionSelected(model.transaction)
                 } else {
-                    transactionUnselected(index)
+                    transactionUnselected(model.transaction)
                 }
             }
         }
