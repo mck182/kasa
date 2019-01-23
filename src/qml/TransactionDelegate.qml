@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
+import QtQuick.Controls.Material 2.2
 import QtQuick.Layouts 1.3
 
 Pane {
@@ -111,10 +112,59 @@ Pane {
             text: model.amount
         }
 
-        Label {
-            id: label4
+        Flow {
+            id: tagsFlow
+
+            property var tagsModel: model.tagsList
+
             Layout.columnSpan: 3
-            text: model.tags
+
+            spacing: 4
+
+            Repeater {
+                width: parent.width
+                height: parent.height
+
+                model: tagsFlow.tagsModel
+
+                Rectangle {
+                    id: tagItem
+                    width: tagLabel.width + closeButton.width + 16
+                    height: tagLabel.height
+                    radius: 10
+                    clip: true
+                    border.width: 1
+                    border.color: "#aa8888"
+
+                    Label {
+                        id: tagLabel
+
+                        text: "#" + modelData
+                        leftPadding: 8
+                    }
+
+                    Label {
+                        id: closeButton
+                        text: "x"
+                        horizontalAlignment: Text.AlignHCenter
+                        anchors.right: parent.right
+                        anchors.rightMargin: 8
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: {
+                            tagItem.color = Material.color(Material.Primary)
+                        }
+
+                        onExited: {
+                            tagItem.color = "transparent"
+                        }
+                    }
+                }
+            }
         }
     }
 }
