@@ -5,8 +5,8 @@ import QtQuick.Layouts 1.3
 import QtQuick.Controls.Universal 2.0
 
 Item {
-    width: 600
-    height: 400
+    width: 800
+    height: 700
 
     property var selectedTransactions: []
 
@@ -31,10 +31,10 @@ Item {
 
                 TextField {
                     id: textField
-                    text: qsTr("")
-                    placeholderText: "Filter by tags or name"
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
+
+                    placeholderText: "Filter by tags or name"
                 }
 
                 Label {
