@@ -35,6 +35,7 @@ public:
         NameRole,
         MemoRole,
         TagsRole,
+        TagsListRole,
         AmountRole
     };
 

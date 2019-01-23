@@ -76,6 +76,8 @@ QVariant TransactionsItemModel::data(const QModelIndex &index, int role) const
                 return transaction->memo();
             case TagsRole:
                 return transaction->tags().join(", ");
+            case TagsListRole:
+                return transaction->tags();
             case AmountRole:
                 return transaction->amount();
         }
@@ -143,6 +145,7 @@ QHash<int, QByteArray> TransactionsItemModel::roleNames() const
     roles[NameRole] = "name";
     roles[MemoRole] = "memo";
     roles[TagsRole] = "tags";
+    roles[TagsListRole] = "tagsList";
     roles[AmountRole] = "amount";
     return roles;
 }
