@@ -64,9 +64,9 @@ MainWindow::MainWindow(QWidget *parent)
         filterProxyModel->setDynamicSortFilter(true);
 
         QQuickView *quickView = new QQuickView();
+        quickView->rootContext()->setContextProperty(QStringLiteral("transactionsModel"), filterProxyModel);
         quickView->setSource(QUrl::fromLocalFile("../kasa/src/qml/Transactions.qml"));
         quickView->setResizeMode(QQuickView::SizeRootObjectToView);
-        quickView->rootContext()->setContextProperty(QStringLiteral("transactionsModel"), filterProxyModel);
         quickView->setModality(Qt::ApplicationModal);
         quickView->show();
 
