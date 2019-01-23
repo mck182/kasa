@@ -19,6 +19,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
+#include <QMutableStringListIterator>
 #include <QDebug>
 
 #include "dbdao.h"
@@ -207,44 +208,7 @@ bool DbDao::updateTransaction(QTransaction *transaction)
 {
     if (!transaction->tags().isEmpty()) {
         Db::sharedInstance()->startTransaction();
-
-        Q_FOREACH(const QString &tag, transaction->tags()) {
-            if (tag.isEmpty()) {
-                continue;
-            }
-
-            //TODO: explore single-query multi-insert
-            QSqlQuery q;
-            q.prepare("INSERT OR IGNORE INTO Tags VALUES (NULL, :name)");
-            q.bindValue(":name", tag);
-            q.exec();
-
-            int tagId;
-
-            //FIXME: This should work but it doesn't
-//            qDebug() << "---> Last insert is valid:" << q.lastInsertId().isValid() << "is null:" << q.lastInsertId().isNull();
-//            if (!q.lastInsertId().isValid()) {
-                QSqlQuery tagQuery;
-                tagQuery.prepare("SELECT id FROM Tags WHERE name = :name");
-                tagQuery.bindValue(":name", tag);
-                tagQuery.exec();
-                qDebug() << "---> Select tags query active:" << tagQuery.isActive();
-                if (tagQuery.isActive()) {
-                    tagQuery.next();
-                    tagId = tagQuery.value(0).toInt();
-                }
-//            } else {
-//                qDebug() << "---> Got valid last insert id:" << q.lastInsertId().toInt();
-//                tagId = q.lastInsertId().toInt();
-//            }
-
-            QSqlQuery q2;
-            q2.prepare("INSERT INTO TransactionTags VALUES (:transactionId, :tagId)");
-            q2.bindValue(":transactionId", transaction->id());
-            q2.bindValue(":tagId", tagId);
-            q2.exec();
-        }
-
+        storeTags(transaction);
         Db::sharedInstance()->commit();
     }
 
@@ -278,6 +242,84 @@ QPair<QDate, QDate> DbDao::oldestAndNewestTransactionDate(QAccount *account)
         return qMakePair(q.record().value(0).toDate(), q.record().value(1).toDate());
     }
 
+}
+
+bool DbDao::applyTags(QVariantList transactions, const QString &tags)
+{
+    QStringList tagsList = tags.split(",");
+    QMutableStringListIterator i(tagsList);
+    while (i.hasNext()) {
+        i.setValue(i.next().trimmed());
+    }
+
+    qDebug() << "Tags to apply:" << tagsList;
+
+    Db::sharedInstance()->startTransaction();
+    bool storeTagsSuccess = true;
+
+    Q_FOREACH (const QVariant &transactionVariant, transactions) {
+        QTransaction *transaction = transactionVariant.value<QTransaction*>();
+        transaction->setTags(tagsList);
+        qDebug() << "Transaction has tags" << transaction->tags() << "from" << tagsList;
+        if (!storeTags(transaction)) {
+            storeTagsSuccess = false;
+            break;
+        }
+    }
+
+    if (storeTagsSuccess) {
+        Db::sharedInstance()->commit();
+    } else {
+        Db::sharedInstance()->rollback();
+    }
+}
+
+bool DbDao::storeTags(QTransaction *transaction)
+{
+    Q_FOREACH(const QString &tag, transaction->tags()) {
+        qDebug() << "Processing tag" << tag;
+        if (tag.isEmpty()) {
+            qDebug() << "Empty, continuing..";
+            continue;
+        }
+
+        //TODO: explore single-query multi-insert
+        QSqlQuery q;
+        q.prepare("INSERT OR IGNORE INTO Tags VALUES (NULL, :name)");
+        q.bindValue(":name", tag);
+        if (!q.exec()) {
+            return false;
+        }
+
+        int tagId;
+
+        //FIXME: This should work but it doesn't
+//            qDebug() << "---> Last insert is valid:" << q.lastInsertId().isValid() << "is null:" << q.lastInsertId().isNull();
+//            if (!q.lastInsertId().isValid()) {
+            QSqlQuery tagQuery;
+            tagQuery.prepare("SELECT id FROM Tags WHERE name = :name");
+            tagQuery.bindValue(":name", tag);
+            tagQuery.exec();
+
+            if (tagQuery.isActive()) {
+                tagQuery.next();
+                tagId = tagQuery.value(0).toInt();
+            }
+//            } else {
+//                qDebug() << "---> Got valid last insert id:" << q.lastInsertId().toInt();
+//                tagId = q.lastInsertId().toInt();
+//            }
+
+            qDebug() << "Adding tag" << tag << "with id" << tagId << "to transaction" << transaction;
+
+        QSqlQuery q2;
+        q2.prepare("INSERT INTO TransactionTags VALUES (:transactionId, :tagId)");
+        q2.bindValue(":transactionId", transaction->id());
+        q2.bindValue(":tagId", tagId);
+        if (!q2.exec()) {
+            return false;
+        }
+    }
 }
 
 QAccount* DbDao::recordToAccount(const QSqlRecord &record) const

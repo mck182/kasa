@@ -19,6 +19,7 @@
 #ifndef KASA_DBDAO_H
 #define KASA_DBDAO_H
 
+#include <QObject>
 #include <QList>
 #include <QDate>
 
@@ -28,7 +29,8 @@ class QStatement;
 class QSqlQuery;
 class QSqlRecord;
 
-class DbDao {
+class DbDao : public QObject {
+    Q_OBJECT
 public:
     QList<QAccount*> accounts() const;
     QList<QTransaction*> transactions(const QString &accountId = QString(), const QDate &from = QDate(), const QDate &to = QDate()) const;
@@ -43,6 +45,9 @@ public:
     bool updateTransaction(QTransaction *transaction);
 
     QPair<QDate, QDate> oldestAndNewestTransactionDate(QAccount *account);
+
+    Q_INVOKABLE bool applyTags(QVariantList transactions, const QString &tags);
+    bool storeTags(QTransaction *transaction);
 
     static DbDao* sharedInstance();
 
