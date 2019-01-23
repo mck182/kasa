@@ -65,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QQuickView *quickView = new QQuickView();
         quickView->rootContext()->setContextProperty(QStringLiteral("transactionsModel"), filterProxyModel);
+        quickView->rootContext()->setContextProperty(QStringLiteral("dbDao"), DbDao::sharedInstance());
         quickView->setSource(QUrl::fromLocalFile("../kasa/src/qml/Transactions.qml"));
         quickView->setResizeMode(QQuickView::SizeRootObjectToView);
         quickView->setModality(Qt::ApplicationModal);
