@@ -389,6 +389,7 @@ QTransaction* DbDao::recordToTransaction(const QSqlRecord &record) const
 
 void DbDao::bindTransactionToQuery(QTransaction *transaction, QSqlQuery &query)
 {
+    query.bindValue(":id", transaction->id());
     query.bindValue(":accountId", transaction->accountId());
     query.bindValue(":memo", transaction->memo());
     query.bindValue(":payeeId", transaction->payeeId());
