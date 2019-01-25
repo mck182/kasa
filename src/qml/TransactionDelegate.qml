@@ -115,6 +115,10 @@ Pane {
 
             spacing: 4
 
+            move: Transition {
+                NumberAnimation { properties: "x,y"; duration: 150; easing.type: Easing.OutQuad }
+            }
+
             Repeater {
                 width: parent.width
                 height: parent.height
@@ -161,6 +165,10 @@ Pane {
                             anchors.fill: parent
 
                             onClicked: {
+                                // FIXME: This is potentially stupid but it's so that
+                                //        the Flow item can run the 'move' transition
+                                tagItem.visible = false
+
                                 var tags = tagsFlow.tagsModel
                                 tags.splice(index, 1)
                                 tagsFlow.transactionItem.tagsList = tags
