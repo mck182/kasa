@@ -159,7 +159,10 @@ Pane {
                         MouseArea {
                             anchors.fill: parent
 
-                            onClicked: { //dbDao.removeTag(transaction, modelData)
+                            onClicked: {
+                                var tags = tagsFlow.tagsModel
+                                tags.splice(index, 1)
+                                tagsFlow.transactionItem.tagsList = tags
                             }
                         }
                     }
