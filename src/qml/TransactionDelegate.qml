@@ -36,14 +36,7 @@ Pane {
             onClicked: {
                 dateLabel.visible = false
                 dateTextField.visible = true
-
-                console.log("-----")
             }
-
-//            Rectangle {
-//                anchors.fill: parent
-//                color: "#ff4444"
-//            }
 
             Label {
                 id: dateLabel
