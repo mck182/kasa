@@ -206,6 +206,7 @@ bool DbDao::storeTransaction(QTransaction *transaction)
 
 bool DbDao::updateTransaction(QTransaction *transaction)
 {
+    Db::sharedInstance()->startTransaction();
     // First remove all tags
     QSqlQuery q;
     q.prepare("DELETE FROM TransactionTags WHERE transactionId = :transactionId");
@@ -219,23 +220,30 @@ bool DbDao::updateTransaction(QTransaction *transaction)
 
     // Now readd tags that are still existing
     if (!transaction->tags().isEmpty()) {
-        Db::sharedInstance()->startTransaction();
         storeTags(transaction);
-        Db::sharedInstance()->commit();
     }
 
-    QSqlQuery q;
-    q.prepare("UPDATE Transactions SET memo = :memo,"
-              "payeeId = :payeeId,"
-              "name = :name,"
-              "bankId = :bankId,"
-              "checkNumber = :checkNumber,"
-              "datePosted = :datePosted,"
-              "amount = :amount"
-              "WHERE id = :id");
+    QSqlQuery q2;
+    q2.prepare("UPDATE Transactions SET memo = :memo, "
+               "accountId = :accountId, "
+               "payeeId = :payeeId, "
+               "name = :name, "
+               "bankId = :bankId, "
+               "checkNumber = :checkNumber, "
+               "datePosted = :datePosted, "
+               "amount = :amount "
+               "WHERE id = :id");
 
-    bindTransactionToQuery(transaction, q);
-    return q.exec();
+    bindTransactionToQuery(transaction, q2);
+
+    if (!q2.exec()) {
+        qWarning() << "Updating transaction failed" << q2.lastError();
+        Db::sharedInstance()->rollback();
+        return false;
+    }
+
+    Db::sharedInstance()->commit();
+    return true;
 }
 
 QPair<QDate, QDate> DbDao::oldestAndNewestTransactionDate(QAccount *account)
