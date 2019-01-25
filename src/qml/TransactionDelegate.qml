@@ -134,7 +134,20 @@ Pane {
                     radius: 10
                     clip: true
                     border.width: 1
-                    border.color: "#aa8888"
+                    border.color: Material.color(Material.primary)
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: {
+                            tagItem.color = Material.color(Material.primary)
+                        }
+
+                        onExited: {
+                            tagItem.color = "transparent"
+                        }
+                    }
 
                     Label {
                         id: tagLabel
@@ -149,18 +162,12 @@ Pane {
                         horizontalAlignment: Text.AlignHCenter
                         anchors.right: parent.right
                         anchors.rightMargin: 8
-                    }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                        MouseArea {
+                            anchors.fill: parent
 
-                        onEntered: {
-                            tagItem.color = Material.color(Material.Primary)
-                        }
-
-                        onExited: {
-                            tagItem.color = "transparent"
+                            onClicked: { //dbDao.removeTag(transaction, modelData)
+                            }
                         }
                     }
                 }
