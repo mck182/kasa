@@ -206,6 +206,18 @@ bool DbDao::storeTransaction(QTransaction *transaction)
 
 bool DbDao::updateTransaction(QTransaction *transaction)
 {
+    // First remove all tags
+    QSqlQuery q;
+    q.prepare("DELETE FROM TransactionTags WHERE transactionId = :transactionId");
+    q.bindValue(":transactionId", transaction->id());
+    if (!q.exec()) {
+        qWarning() << q.lastError();
+        qDebug() << "Deleting tags failed, rollback";
+        Db::sharedInstance()->rollback();
+        return false;
+    }
+
+    // Now readd tags that are still existing
     if (!transaction->tags().isEmpty()) {
         Db::sharedInstance()->startTransaction();
         storeTags(transaction);
