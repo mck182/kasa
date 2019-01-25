@@ -346,6 +346,8 @@ bool DbDao::storeTags(QTransaction *transaction)
             return false;
         }
     }
+
+    return true;
 }
 
 QAccount* DbDao::recordToAccount(const QSqlRecord &record) const
