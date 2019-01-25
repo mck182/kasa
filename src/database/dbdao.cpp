@@ -312,6 +312,7 @@ bool DbDao::storeTags(QTransaction *transaction)
         q.prepare("INSERT OR IGNORE INTO Tags VALUES (NULL, :name)");
         q.bindValue(":name", tag);
         if (!q.exec()) {
+            qWarning() << "Storing tags failed" << q.lastError();
             return false;
         }
 
@@ -341,6 +342,7 @@ bool DbDao::storeTags(QTransaction *transaction)
         q2.bindValue(":transactionId", transaction->id());
         q2.bindValue(":tagId", tagId);
         if (!q2.exec()) {
+            qWarning() << "Adding tags to transactions failed" << q2.lastError();
             return false;
         }
     }
