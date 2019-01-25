@@ -88,29 +88,58 @@ QVariant TransactionsItemModel::data(const QModelIndex &index, int role) const
 
 bool TransactionsItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (!index.isValid() || role != Qt::EditRole) return false;
+    if (!index.isValid()) return false;
 
     int row = index.row();
     int column = index.column();
 
     QTransaction *transaction = m_transactions.at(row);
 
-    switch (column) {
-//        case 0:
-//            transaction->setDatePosted(value);
-        case 1:
-            transaction->setName(value.toString());
-        case 2:
-            transaction->setMemo(value.toString());
-        case 3:
-            transaction->setTags(value.toString().split(',', QString::SkipEmptyParts));
-        case 4:
-            transaction->setAmount(value.toDouble());
+    if (role == Qt::EditRole) {
+        switch (column) {
+    //        case 0:
+    //            transaction->setDatePosted(value);
+            case 1:
+                transaction->setName(value.toString());
+            case 2:
+                transaction->setMemo(value.toString());
+            case 3:
+                transaction->setTags(value.toString().split(',', QString::SkipEmptyParts));
+            case 4:
+                transaction->setAmount(value.toDouble());
+        }
+    } else {
+        switch (role) {
+            case DatePostedRole:
+                break;
+            case NameRole:
+                transaction->setName(value.toString());
+                break;
+            case MemoRole:
+                transaction->setMemo(value.toString());
+                break;
+            case TagsRole:
+                transaction->setTags(value.toString().split(',', QString::SkipEmptyParts));
+                break;
+            case TagsListRole:
+                transaction->setTags(value.toStringList());
+                break;
+            case AmountRole:
+                transaction->setAmount(value.toDouble());
+                break;
+            default:
+                return false;
+                break;
+        }
     }
 
-    Q_EMIT dataChanged(index, index);
+    bool updateSuccessful = DbDao::sharedInstance()->updateTransaction(transaction);
 
-    DbDao::sharedInstance()->updateTransaction(transaction);
+    if (updateSuccessful) {
+        Q_EMIT dataChanged(index, index);
+    }
+
+    return updateSuccessful;
 }
 
 QVariant TransactionsItemModel::headerData(int section, Qt::Orientation orientation, int role) const
