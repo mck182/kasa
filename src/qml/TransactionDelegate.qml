@@ -108,6 +108,7 @@ Pane {
         Flow {
             id: tagsFlow
 
+            property var transactionItem: model
             property var tagsModel: model.tagsList
 
             Layout.columnSpan: 3
