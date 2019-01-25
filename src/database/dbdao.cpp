@@ -274,6 +274,30 @@ bool DbDao::applyTags(QVariantList transactions, const QString &tags)
     }
 }
 
+bool DbDao::removeTag(QTransaction *transaction, const QString &tag)
+{
+    if (transaction == nullptr) {
+        return false;
+    }
+
+    QStringList tagsList = transaction->tags();
+    tagsList.removeOne(tag);
+
+    transaction->setTags(tagsList);
+
+    QSqlQuery q;
+    q.prepare("DELETE FROM TransactionTags WHERE transactionId = :transactionId AND tagId = (SELECT id FROM Tags WHERE name = :tag)");
+    q.bindValue(":transactionId", transaction->id());
+    q.bindValue(":tag", tag);
+
+    bool result = q.exec();
+    if (!result) {
+        qDebug() << q.lastError();
+    }
+
+    return result;
+}
+
 bool DbDao::storeTags(QTransaction *transaction)
 {
     Q_FOREACH(const QString &tag, transaction->tags()) {

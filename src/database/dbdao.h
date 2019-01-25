@@ -47,6 +47,7 @@ public:
     QPair<QDate, QDate> oldestAndNewestTransactionDate(QAccount *account);
 
     Q_INVOKABLE bool applyTags(QVariantList transactions, const QString &tags);
+    Q_INVOKABLE bool removeTag(QTransaction *transaction, const QString &tag);
     bool storeTags(QTransaction *transaction);
 
     static DbDao* sharedInstance();
