@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.3
 
 Pane {
     width: 400
+    height: 90
 
     signal transactionSelected(var selectedTransaction)
     signal transactionUnselected(var unselectedTransaction)
@@ -31,7 +32,7 @@ Pane {
 
         MouseArea {
             width: 80
-            height: 48
+            height: 40
 
             onClicked: {
                 dateLabel.visible = false
