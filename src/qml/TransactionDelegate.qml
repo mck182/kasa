@@ -40,69 +40,55 @@ Pane {
 
             Label {
                 id: dateLabel
-                anchors.fill: parent
+                anchors.verticalCenter: parent.verticalCenter
                 text: model.datePosted
             }
 
-            TextField {
-                id: dateTextField
-                anchors.fill: parent
-                visible: false
+//            TextField {
+//                id: dateTextField
+//                anchors.fill: parent
+//                visible: false
 
-                onEditingFinished: {
-                    dateLabel.visible = true
-                    dateTextField.visible = false
-                }
-            }
+//                onEditingFinished: {
+//                    dateLabel.visible = true
+//                    dateTextField.visible = false
+//                }
+//            }
         }
 
-        MouseArea {
-            id: nameMouseArea
-            Layout.fillHeight: true
+        EditableLabel {
+            id: nameEditableLabel
+
             Layout.fillWidth: true
 
-            onClicked: {
-                nameLabel.visible = false
-                nameTextField.visible = true
-                nameTextField.forceActiveFocus()
-                nameMouseArea.enabled = false
-            }
-
-//            Rectangle {
-//                anchors.fill: parent
-//                color: "#ff4444"
-//            }
-
-            Label {
-                id: nameLabel
-                anchors.fill: parent
-                text: model.name
-                visible: true
-            }
-
-            TextField {
-                id: nameTextField
-                text: nameLabel.text
-                placeholderText: "Transaction name..."
-                anchors.fill: parent
-                visible: false
-
-                onEditingFinished: {
-                    nameLabel.visible = true
-                    nameTextField.visible = false
-                    nameMouseArea.enabled = true
-                }
-            }
+            placeholderText: "Transaction name..."
+            text: model.name
         }
 
-        Label {
-            id: label3
+        EditableLabel {
+            id: memoEditableLabel
+
+            placeholderText: "Memo..."
             text: model.memo
         }
 
-        Label {
-            id: label2
+        EditableLabel {
+            id: amountEditableLabel
+
+            //FIXME: TextMetrics return wrong width for some reason
+            Layout.minimumWidth: 68
+            Layout.maximumWidth: 68
+
+            horizontalAlignment: Text.AlignRight
+            placeholderText: "Amount.."
             text: model.amount
+
+            TextMetrics {
+                id: amountTextMetrics
+
+                font: amountEditableLabel.font
+                text: "-88,888"
+            }
         }
 
         Flow {
