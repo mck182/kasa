@@ -92,73 +92,112 @@ Pane {
             }
         }
 
-        Flow {
-            id: tagsFlow
+        MouseArea {
+            id: tagsMouseArea
 
             property var transactionItem: model
             property var tagsModel: model.tagsList
+            property var tags: model.tags
 
             Layout.columnSpan: 3
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-            spacing: 4
-
-            move: Transition {
-                NumberAnimation { properties: "x,y"; duration: 150; easing.type: Easing.OutQuad }
+            onClicked: {
+                if (textField.visible) {
+                    transactionItem.tags = textField.text
+                    textField.visible = false
+                    tagsFlow.visible = true
+                } else {
+                    textField.visible = true
+                    tagsFlow.visible = false
+                }
             }
 
-            Repeater {
-                width: parent.width
-                height: parent.height
+            TextField {
+                id: textField
 
-                model: tagsFlow.tagsModel
+                anchors.fill: parent
 
-                Rectangle {
-                    id: tagItem
-                    width: tagLabel.width + closeButton.width + 16
-                    height: tagLabel.height
-                    radius: 10
-                    clip: true
-                    border.width: 1
-                    border.color: Material.color(Material.primary)
+                text: tagsMouseArea.tags
+                visible: false
 
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                onEditingFinished: {
+                    tagsMouseArea.transactionItem.tags = textField.text
+                    textField.visible = false
+                    tagsFlow.visible = true
+                }
+            }
 
-                        onEntered: {
-                            tagItem.color = Material.color(Material.primary)
-                        }
+            Flow {
+                id: tagsFlow
 
-                        onExited: {
-                            tagItem.color = "transparent"
-                        }
+                anchors.fill: parent
+
+                spacing: 4
+
+                move: Transition {
+                    NumberAnimation {
+                        properties: "x,y"
+                        duration: 150
+                        easing.type: Easing.OutQuad
                     }
+                }
 
-                    Label {
-                        id: tagLabel
+                Repeater {
+                    width: parent.width
+                    height: parent.height
 
-                        text: "#" + modelData
-                        leftPadding: 8
-                    }
+                    model: tagsMouseArea.tagsModel
 
-                    Label {
-                        id: closeButton
-                        text: "x"
-                        horizontalAlignment: Text.AlignHCenter
-                        anchors.right: parent.right
-                        anchors.rightMargin: 8
+                    Rectangle {
+                        id: tagItem
+                        width: tagLabel.width + closeButton.width + 16
+                        height: tagLabel.height
+                        radius: 10
+                        clip: true
+                        border.width: 1
+                        border.color: Material.color(Material.primary)
 
                         MouseArea {
                             anchors.fill: parent
+                            hoverEnabled: true
 
-                            onClicked: {
-                                // FIXME: This is potentially stupid but it's so that
-                                //        the Flow item can run the 'move' transition
-                                tagItem.visible = false
+                            onEntered: {
+                                tagItem.color = Material.color(Material.primary)
+                            }
 
-                                var tags = tagsFlow.tagsModel
-                                tags.splice(index, 1)
-                                tagsFlow.transactionItem.tagsList = tags
+                            onExited: {
+                                tagItem.color = "transparent"
+                            }
+                        }
+
+                        Label {
+                            id: tagLabel
+
+                            text: "#" + modelData
+                            leftPadding: 8
+                        }
+
+                        Label {
+                            id: closeButton
+                            text: "x"
+                            horizontalAlignment: Text.AlignHCenter
+                            anchors.right: parent.right
+                            anchors.rightMargin: 8
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                onClicked: {
+                                    // FIXME: This is potentially stupid but it's so that
+                                    //        the Flow item can run the 'move' transition
+                                    tagItem.visible = false
+
+                                    var tags = tagsMouseArea.tagsModel
+                                    tags.splice(index, 1)
+                                    tagsMouseArea.transactionItem.tagsList = tags
+                                }
                             }
                         }
                     }
